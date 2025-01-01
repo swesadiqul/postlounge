@@ -6,8 +6,10 @@ from accounts import views
 # Include your URL patterns here.
 urlpatterns = [
     path('register/', views.RegistrationView.as_view(), name='register'),
-    # path('login/', views.UserLogin.as_view(), name='login'),
-    # path('profile/', views.UserProfile.as_view(), name='profile'),
+    path('send-otp/', views.SendOTPView.as_view(), name='send_otp'),
+    path('verify-otp/', views.VerifyOTPView.as_view(), name='verify_otp'),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('profile/', views.ProfileView.as_view(), name='profile'),
     # path('logout/', views.UserLogout.as_view(), name='logout'),
     # path('users/', views.UserList.as_view(), name='user_list'),
     # path('users/<int:pk>/', views.UserDetail.as_view(), name='user_detail'),

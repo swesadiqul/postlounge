@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.utils import timezone
+
 
 # Custom manager for user creation
 class UserManager(BaseUserManager):
@@ -19,11 +21,17 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, name, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("email_verified", True)
+
 
         if not extra_fields.get("is_staff"):
             raise ValueError("Superuser must have is_staff=True.")
         if not extra_fields.get("is_superuser"):
             raise ValueError("Superuser must have is_superuser=True.")
+        if extra_fields.get("role") and extra_fields["role"] != "Admin":
+            raise ValueError("Superuser must have role='Admin'.")
+        
+        extra_fields.setdefault("role", "Admin")
 
         return self.create_user(email, name, password, **extra_fields)
 
@@ -47,6 +55,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     terms_accepted = models.BooleanField(default=False)
+    otp = models.CharField(max_length=6, null=True, blank=True, editable=False)
+    otp_expiry = models.DateTimeField(null=True, blank=True)
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,6 +69,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
 
+
+    def is_otp_expired(self):
+        """Check if the OTP has expired."""
+        if self.otp_expiry:
+            return timezone.now() > self.otp_expiry
+        return False
+
     def __str__(self):
         return self.email
+
 
