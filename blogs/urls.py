@@ -9,11 +9,11 @@ urlpatterns = [
     path('categories/<int:pk>/update/', views.CategoryUpdateView.as_view(), name='category_update'),
     path('categories/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
     
-    # path('tags/', views.TagList.as_view(), name='tag_list'),
-    # path('tags/<int:pk>/', views.TagDetail.as_view(), name='tag_detail'),
-    # path('tags/create/', views.TagCreate.as_view(), name='tag_create'),
-    # path('tags/<int:pk>/update/', views.TagUpdate.as_view(), name='tag_update'),
-    # path('tags/<int:pk>/delete/', views.TagDelete.as_view(), name='tag_delete'),
+    path('tags/', views.TagListView.as_view(), name='tag_list'),
+    path('tags/<int:pk>/', views.TagDetailView.as_view(), name='tag_detail'),
+    path('tags/create/', views.TagCreateView.as_view(), name='tag_create'),
+    path('tags/<int:pk>/update/', views.TagUpdateView.as_view(), name='tag_update'),
+    path('tags/<int:pk>/delete/', views.TagDeleteView.as_view(), name='tag_delete'),
 
     # path('posts/', views.PostList.as_view(), name='post_list'),
     # path('posts/<int:pk>/', views.PostDetail.as_view(), name='post_detail'),

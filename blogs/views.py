@@ -86,4 +86,79 @@ class CategoryDeleteView(APIView):
     
 
 
+class TagListView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = TagSerializer
+
+    @swagger_auto_schema(tags=["Tag"], operation_id="Get all tags")
+    def get(self, request):
+        tags = Tag.objects.all()
+        serializer = self.serializer_class(tags, many=True)
+        return Response({"status": "success", "message": "Tags retrieved successfully!", "code": status.HTTP_200_OK, "data": serializer.data}, status=status.HTTP_200_OK)
+    
+
+class TagCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = TagSerializer
+
+    @swagger_auto_schema(request_body=TagSerializer, tags=["Tag"], operation_id="Create a tag")
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "success", "message": "Tag created successfully!", "code": status.HTTP_201_CREATED, "data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"status": "error", "message": "Invalid input data.", "code": status.HTTP_400_BAD_REQUEST, "detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class TagDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = TagSerializer
+
+    @swagger_auto_schema(tags=["Tag"], operation_id="Get a tag by ID")
+    def get(self, request, pk):
+        try:
+            tag = Tag.objects.get(pk=pk)
+        except Tag.DoesNotExist:
+            return Response({"status": "error", "message": "Tag not found.", "code": status.HTTP_404_NOT_FOUND}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer_class(tag)
+        return Response({"status": "success", "message": "Tag retrieved successfully!", "code": status.HTTP_200_OK, "data": serializer.data}, status=status.HTTP_200_OK)
+    
+
+class TagUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = TagSerializer
+
+
+    @swagger_auto_schema(request_body=TagSerializer, tags=["Tag"], operation_id="Update a tag")
+    def put(self, request, pk):
+        try:
+            tag = Tag.objects.get(pk=pk)
+        except Tag.DoesNotExist:
+            return Response({"status": "error", "message": "Tag not found.", "code": status.HTTP_404_NOT_FOUND}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = self.serializer_class(instance=tag, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "success", "message": "Tag updated successfully!", "code": status.HTTP_200_OK, "data": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"status": "error", "message": "Invalid input data.", "code": status.HTTP_400_BAD_REQUEST, "detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class TagDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = TagSerializer
+
+    @swagger_auto_schema(tags=["Tag"], operation_id="Delete a tag")
+    def delete(self, request, pk):
+        try:
+            tag = Tag.objects.get(pk=pk)
+        except Tag.DoesNotExist:
+            return Response({"status": "error", "message": "Tag not found.", "code": status.HTTP_404_NOT_FOUND}, status=status.HTTP_404_NOT_FOUND)
+        tag.delete()
+        return Response({"status": "success", "message": "Tag deleted successfully!", "code": status.HTTP_204_NO_CONTENT}, status=status.HTTP_204_NO_CONTENT)
     

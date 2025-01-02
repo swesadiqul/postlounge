@@ -28,19 +28,18 @@ class Category(models.Model):
         return self.name
 
 
-# class Tag(models.Model):
-#     name = models.CharField(max_length=255)
-#     slug = models.SlugField(unique=True)
-#     post_count = models.IntegerField(default=0)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-#     def save(self, *args, **kwargs):
-#         self.slug = slugify(self.name)
-#         super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
-#     def __str__(self):
-#         return self.name
+    def __str__(self):
+        return self.name
 
 
 # class Post(models.Model):
