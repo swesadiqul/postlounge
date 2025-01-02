@@ -70,7 +70,7 @@ class Tag(models.Model):
 #     view_count = models.IntegerField(default=0)
 #     comment_count = models.IntegerField(default=0)
 #     post_type = models.CharField(max_length=50, choices=[('article', 'Article'), ('news', 'News'), ('event', 'Event')], default='article')
-#     category = models.ForeignKey('Category', on_delete=models.CASCADE, null=True, blank=True)
+#     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
 
 #     # Timestamps
 #     created_at = models.DateTimeField(auto_now_add=True)
