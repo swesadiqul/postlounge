@@ -1,28 +1,31 @@
-# from django.db import models
-# from django.utils.text import slugify
-# from accounts.models import User
-# from django.db.models.signals import pre_save
-# from django.dispatch import receiver
+from django.db import models
+from django.utils.text import slugify
+from accounts.models import User
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
-# # Create your models here.
-# class Category(models.Model):
-#     name = models.CharField(max_length=255)
-#     description = models.TextField(null=True, blank=True)
-#     slug = models.SlugField(unique=True)
-#     parent_category = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
-#     author = models.ForeignKey(User, on_delete=models.CASCADE)
-#     post_count = models.IntegerField(default=0)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
+# Create your models here.
+class Category(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(null=True, blank=True)
+    slug = models.SlugField(unique=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+        ordering = ['-created_at']
     
 
-#     def save(self, *args, **kwargs):
-#         self.slug = slugify(self.name)
-#         super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
-#     def __str__(self):
-#         return self.name
+    def __str__(self):
+        return self.name
 
 
 # class Tag(models.Model):
