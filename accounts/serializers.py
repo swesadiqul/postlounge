@@ -131,54 +131,120 @@ class LogoutSerializer(serializers.Serializer):
         return True
     
 
-class ProfileSerializer(serializers.ModelSerializer):
+# class ProfileSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ['id', 'name', 'email', 'phone_number', 'address', 'email_verified', 'profile_picture', 'bio', 'social_links', 'role', 'is_active', 'is_staff', 'is_superuser', 'terms_accepted', 'created_at', 'updated_at', 'last_login']
+#         read_only_fields = ['id', 'email', 'email_verified', 'role', 'is_active', 'is_staff', 'is_superuser', 'terms_accepted', 'created_at', 'updated_at', 'last_login']
+
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'phone_number', 'address', 'email_verified', 'profile_picture', 'bio', 'social_links', 'role', 'is_active', 'is_staff', 'is_superuser', 'terms_accepted', 'created_at', 'updated_at', 'last_login']
+        read_only_fields = ['id', 'email', 'email_verified', 'role', 'is_active', 'is_staff', 'is_superuser', 'terms_accepted', 'created_at', 'updated_at', 'last_login']
+
+
+
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    new_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+
+    class Meta:
+        model = User
+        fields = ['old_password', 'new_password', 'confirm_password']
+    
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise ValidationError("Old password is incorrect.")
+        return value
+    
+    def validate(self, data):
+        if data['new_password'] != data['confirm_password']:
+            raise ValidationError("Passwords do not match.")
+        validate_password(data['new_password'])
+        return data
+    
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data['new_password'])
+        instance.save()
+        return instance
+    
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    class Meta:
+        fields = ['email']
+    
+    def validate_email(self, email):
+        email = email.lower()
+        if not User.objects.filter(email=email).exists():
+            raise ValidationError("The provided email does not exist.")
+        return email
+    
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    new_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    
+
+    class Meta:
+        fields = ['email', 'new_password', 'confirm_password']
+
+
+    def validate_email(self, email):
+        email = email.lower()
+        if not User.objects.filter(email=email).exists():
+            raise ValidationError("The provided email does not exist.")
+        return email
+    
+
+    def validate(self, data):
+        if data['new_password'] != data['confirm_password']:
+            raise ValidationError("Passwords do not match.")
+        validate_password(data['new_password'])
+        return data
+    
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data['new_password'])
+        instance.save()
+        return instance
+    
+
+
+class EmailVerifySerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
+
+    class Meta:
+        fields = ['email', 'otp']
+    
+    def validate(self, attrs):
+        email = attrs.get('email').lower()
+        otp = attrs.get('otp')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise ValidationError({"email": "User does not exist."})
         
 
-
-    
-
-# class UserUpdateSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(write_only=True, required=False)
-#     confirm_password = serializers.CharField(write_only=True, required=False)
-
-#     class Meta:
-#         model = User
-#         fields = ['id', 'username', 'email', 'password', 'confirm_password', 'phone_number', 'address', 'email_verified', 'profile_picture', 'bio', 'social_links', 'location', 'role', 'is_active', 'is_staff', 'is_superuser', 'terms_accepted', 'created_at', 'updated_at', 'last_login']
-#         read_only_fields = ['id', 'created_at', 'updated_at', 'last_login']
+        # Check if the OTP matches
+        if user.otp != otp:
+            raise ValidationError({"otp": "Invalid OTP."})
+        
+        # Check if OTP is expired
+        if user.otp_expiry and now() > user.otp_expiry:
+            raise ValidationError({"otp": "OTP has expired. Please request a new one."})
+        
+        return attrs
 
 
-#     def validate(self, data):
-#         if 'password' in data:
-#             if data['password'] != data['confirm_password']:
-#                 raise ValidationError("Passwords do not match.")
-#             validate_password(data['password'])
-#         return data
-    
-#     def update(self, instance, validated_data):
-#         if 'password' in validated_data:
-#             validated_data.pop('confirm_password')
-#             instance.set_password(validated_data['password'])
-#         instance.save()
-#         return instance
-    
-
-
-# class UserListSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['id', 'username', 'email', 'email_verified', 'created_at', 'updated_at', 'last_login']
-#         read_only_fields = ['id', 'created_at', 'updated_at', 'last_login']
-    
-
-
-
-# class UserDetailSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['id', 'username', 'email', 'phone_number', 'address', 'email_verified', 'profile_picture', 'bio', 'social_links', 'location', 'role', 'is_active', 'is_staff', 'is_superuser', 'terms_accepted', 'created_at', 'updated_at', 'last_login']
-#         read_only_fields = ['id', 'created_at', 'updated_at', 'last_login']
 
 
