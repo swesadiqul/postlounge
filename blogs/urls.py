@@ -15,9 +15,10 @@ urlpatterns = [
     path('tags/<int:pk>/update/', views.TagUpdateView.as_view(), name='tag_update'),
     path('tags/<int:pk>/delete/', views.TagDeleteView.as_view(), name='tag_delete'),
 
-    # path('posts/', views.PostList.as_view(), name='post_list'),
-    # path('posts/<int:pk>/', views.PostDetail.as_view(), name='post_detail'),
-    # path('posts/create/', views.PostCreate.as_view(), name='post_create'),
-    # path('posts/<int:pk>/update/', views.PostUpdate.as_view(), name='post_update'),
-    # path('posts/<int:pk>/delete/', views.PostDelete.as_view(), name='post_delete'),
+    path('posts/', views.PostListAPIView.as_view(), name='post_list'),
+    path('posts/create/', views.PostCreateAPIView.as_view(), name='post_create'),
+    path('posts/<int:pk>/', views.PostRetrieveAPIView.as_view(), name='post_detail'),
+    path('posts/<int:pk>/update/', views.PostUpdateAPIView.as_view(), name='post_update'),
+    path('posts/<int:pk>/partial-update/', views.PostPartialUpdateAPIView.as_view(), name='post_partial_update'),
+    path('posts/<int:pk>/delete/', views.PostDeleteAPIView.as_view(), name='post_delete'),
 ]
